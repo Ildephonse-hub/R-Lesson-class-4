@@ -1,6 +1,6 @@
 ---
 title: "Class 4 - Regression and Data Visualization"
-author: "Dr. Pacifique"
+author: "IGIRUKWAYO Ildephonse"
 date: "2025-10-08"
 output:
   html_document:
@@ -182,10 +182,4 @@ abline(lm.ineq, col="blue", lwd=2)
 text(x=5, y=1.5, labels=paste("r =", round(cor(data.21$Income.inequality, data.21$Index.HS), 2)))
 ```
 
----
-
-# Homework
-1. Fit a **multiple linear regression** using a dataset of your choice. Interpret coefficients.  
-2. Read about **variable selection methods** in regression.  
-3. Create your own **simulation** for polynomial regression.  
 
