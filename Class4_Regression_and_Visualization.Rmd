@@ -1,0 +1,191 @@
+---
+title: "Class 4 - Regression and Data Visualization"
+author: "Dr. Pacifique"
+date: "2025-10-08"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Regression
+
+Regression is a set of methodologies used to analyze the relationship between
+a **dependent variable (outcome or response)** and one or more **independent variables**
+(also called inputs or explanatory variables). Regression can provide an equation for
+predicting the response from explanatory variables.
+
+## Varieties of Regression Analysis
+
+| Type | Purpose |
+|------|----------|
+| Simple Linear | Predicting a quantitative response variable from a quantitative explanatory variable |
+| Polynomial | Predicting a quantitative response variable where the relationship is modeled as an nth order polynomial |
+| Multiple Linear | Predicting a quantitative response variable from two or more explanatory variables |
+| Multilevel | Predicting a response variable from hierarchical data |
+| Multivariate | Predicting multiple response variables from one or more explanatory variables |
+| Logistic | Predicting a categorical response variable |
+| Poisson | Predicting count data |
+| Cox Proportional Hazards | Predicting time-to-event data (death, failure, relapse) |
+| Time Series | Modeling time-correlated data |
+| Nonlinear | Predicting a quantitative response variable with nonlinear models |
+| Nonparametric | Predicting from data-driven model forms |
+| Robust | Resistant regression methods against outliers |
+
+---
+
+# Linear Regression
+
+A **linear model** predicts a continuous variable.  
+It can be expressed as:  
+\( y = mx + b \) or \( y = b_0 + b_1x \)
+
+- Errors in prediction are called **residuals**
+- The **best fit line** minimizes the residual sum of squares (RSS)
+- Measures: **MSE**, **RMSE**
+- Goal: A simple yet useful approximation of data
+
+---
+
+## Ordinary Least Squares (OLS)
+
+OLS regression selects model parameters (intercept and slopes) that minimize the
+difference between actual and predicted values.
+
+### Assumptions
+
+1. **Normality**: The dependent variable is normally distributed for fixed independent values  
+2. **Independence**: Observations are independent  
+3. **Linearity**: The dependent variable is linearly related to the independent variables  
+4. **Homoscedasticity**: Equal variance across levels of independent variables  
+
+Violating these assumptions affects tests and confidence intervals.
+
+---
+
+## Fitting Regression Models with `lm()`
+
+### Simple Linear Regression
+```{r}
+data("women")
+fit <- lm(weight ~ height, data = women)
+summary(fit)
+```
+
+### Plotting the Regression Line
+```{r}
+plot(women$height, women$weight,
+     xlab = "Height (in inches)",
+     ylab = "Weight (in pounds)",
+     main = "Simple Linear Regression: Women Dataset")
+abline(fit, col="blue", lwd=2)
+```
+
+---
+
+## Polynomial Regression
+
+```{r}
+fit2 <- lm(weight ~ height + I(height^2), data = women)
+summary(fit2)
+
+plot(women$height, women$weight,
+     xlab="Height (in inches)", ylab="Weight (in pounds)",
+     main="Polynomial Regression: Women Dataset")
+lines(women$height, fitted(fit2), col="red", lwd=2)
+```
+
+---
+
+## Regression Diagnostics
+
+To check model assumptions:
+```{r}
+fit <- lm(weight ~ height, data=women)
+par(mfrow=c(2,2))
+plot(fit)
+```
+
+### Interpretation
+
+- **Normality**: Check QQ plot (should be linear)
+- **Linearity**: Residuals vs Fitted should show no clear pattern
+- **Homoscedasticity**: Residual spread should be random
+- **Influential Points**: Detected using Cook’s distance
+
+---
+
+## Corrective Measures
+
+1. Delete influential observations  
+2. Transform variables  
+3. Add or remove variables  
+4. Use robust regression methods  
+
+---
+
+## Example: `mtcars` Dataset
+```{r}
+data(mtcars)
+model <- lm(mpg ~ wt, data=mtcars)
+summary(model)
+
+plot(mpg ~ wt, data=mtcars, main="MPG vs Weight")
+abline(model, col="blue", lwd=2)
+```
+
+Interpretation:  
+- The slope (b1) = -5.34 indicates that as car weight increases by 1, fuel efficiency decreases by ~5.34 miles per gallon.  
+- R² = 0.75 means 75% of the variance in mpg is explained by weight.
+
+---
+
+## Simulation in R
+
+Simulation introduces randomness in data or models.
+
+### Random Numbers from Normal Distribution
+```{r}
+set.seed(1)
+rnorm(5)
+```
+
+### Simulating a Linear Model
+```{r}
+set.seed(20)
+x <- rnorm(100)
+e <- rnorm(100, 0, 2)
+y <- 0.5 - 2 * x + e
+plot(x, y, main="Simulated Linear Relationship")
+```
+
+---
+
+# Data Visualization Example
+
+```{r}
+country <- c("Australia","Austria","Belgium","Canada","Denmark","Finland","France","Germany",
+             "Greece","Ireland","Italy","Japan","Netherland","New Zealand","Norway","Portugal",
+             "Spain","Sweden","Switzerland","UK","USA")
+Income.inequality <- c(7.0,4.8,4.6,5.6,4.3,3.7,5.6,5.2,6.2,6.0,6.7,3.4,5.3,6.8,3.9,8.0,5.5,4.0,5.7,7.2,8.6)
+Index.HS <- c(0.07,0.01,-0.23,-0.07,-0.19,-0.43,0.05,-0.06,0.38,0.25,-0.12,-1.26,-0.51,0.29,-0.63,1.18,-0.30,-0.83,-0.46,0.79,2.02)
+
+data.21 <- data.frame(country, Income.inequality, Index.HS)
+
+plot(data.21$Income.inequality, data.21$Index.HS, pch=20, col="red",
+     main="Income Inequality vs Index of Health & Social Problems",
+     xlab="Income Inequality (5th Ratio)",
+     ylab="Index of Health and Social Problems")
+text(data.21$Income.inequality, data.21$Index.HS, labels=country, pos=4, cex=0.7)
+lm.ineq <- lm(Index.HS ~ Income.inequality, data=data.21)
+abline(lm.ineq, col="blue", lwd=2)
+text(x=5, y=1.5, labels=paste("r =", round(cor(data.21$Income.inequality, data.21$Index.HS), 2)))
+```
+
+---
+
+# Homework
+1. Fit a **multiple linear regression** using a dataset of your choice. Interpret coefficients.  
+2. Read about **variable selection methods** in regression.  
+3. Create your own **simulation** for polynomial regression.  
+
